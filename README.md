@@ -1,1 +1,1 @@
-# mcaf-terraform-aws-stream
+# terraform-aws-mcaf-stream
