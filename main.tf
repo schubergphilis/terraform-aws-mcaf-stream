@@ -1,3 +1,7 @@
+locals {
+  parquet = var.parquet ? { create = true } : {}
+}
+
 module kinesis {
   source     = "github.com/schubergphilis/terraform-aws-mcaf-kinesis?ref=v0.1.1"
   name       = var.name
@@ -25,6 +29,7 @@ data aws_iam_policy_document firehose_s3_role {
 
   statement {
     actions = [
+      "glue:GetTableVersions",
       "logs:PutLogEvents"
     ]
     resources = [
@@ -99,10 +104,46 @@ resource aws_kinesis_firehose_delivery_stream default {
   }
 
   extended_s3_configuration {
-    role_arn        = module.firehose_s3_role.arn
-    bucket_arn      = module.bucket.arn
-    kms_key_arn     = var.kms_key_arn
-    buffer_size     = var.buffer_size
-    buffer_interval = var.buffer_interval
+    role_arn            = module.firehose_s3_role.arn
+    bucket_arn          = module.bucket.arn
+    buffer_size         = var.buffer_size
+    buffer_interval     = var.buffer_interval
+    error_output_prefix = var.error_prefix
+    kms_key_arn         = var.kms_key_arn
+    prefix              = var.prefix
+
+    dynamic data_format_conversion_configuration {
+      for_each = local.parquet
+
+      content {
+        enabled = true
+
+        input_format_configuration {
+          deserializer {
+            open_x_json_ser_de {}
+          }
+        }
+
+        output_format_configuration {
+          serializer {
+            parquet_ser_de {}
+          }
+        }
+
+        schema_configuration {
+          database_name = var.glue_database_name
+          role_arn      = module.firehose_s3_role.arn
+          table_name    = var.glue_table_name
+        }
+      }
+    }
+
+    dynamic processing_configuration {
+      for_each = local.parquet
+
+      content {
+        enabled = false
+      }
+    }
   }
 }
