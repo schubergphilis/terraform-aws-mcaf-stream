@@ -3,14 +3,14 @@ locals {
 }
 
 module kinesis {
-  source     = "github.com/schubergphilis/terraform-aws-mcaf-kinesis?ref=v0.1.1"
+  source     = "github.com/schubergphilis/terraform-aws-mcaf-kinesis?ref=v0.1.2"
   name       = var.name
   kms_key_id = var.kms_key_id
   tags       = var.tags
 }
 
 module bucket {
-  source     = "github.com/schubergphilis/terraform-aws-mcaf-s3?ref=v0.1.1"
+  source     = "github.com/schubergphilis/terraform-aws-mcaf-s3?ref=v0.1.4"
   name       = var.name
   kms_key_id = var.kms_key_id
   tags       = var.tags
@@ -54,11 +54,11 @@ data aws_iam_policy_document firehose_s3_role {
 }
 
 module firehose_s3_role {
-  source                = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.1.2"
+  source                = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.1.3"
   name                  = "FirehoseS3Role-${var.name}"
   principal_type        = "Service"
   principal_identifiers = ["firehose.amazonaws.com"]
-  policy                = data.aws_iam_policy_document.firehose_s3_role.json
+  role_policy           = data.aws_iam_policy_document.firehose_s3_role.json
   tags                  = var.tags
 }
 
@@ -85,11 +85,11 @@ data aws_iam_policy_document firehose_kinesis_role {
 }
 
 module firehose_kinesis_role {
-  source                = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.1.2"
+  source                = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.1.3"
   name                  = "FirehoseKinesisRole-${var.name}"
   principal_type        = "Service"
   principal_identifiers = ["firehose.amazonaws.com"]
-  policy                = data.aws_iam_policy_document.firehose_kinesis_role.json
+  role_policy           = data.aws_iam_policy_document.firehose_kinesis_role.json
   tags                  = var.tags
 }
 
