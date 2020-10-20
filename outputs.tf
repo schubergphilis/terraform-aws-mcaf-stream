@@ -1,9 +1,9 @@
 output "name" {
-  value       = module.kinesis.name
+  value       = var.kinesis ? module.kinesis["create"].name : null
   description = "Name of the stream"
 }
 
 output "arn" {
-  value       = module.kinesis.arn
+  value       = var.kinesis ? module.kinesis["create"].arn : null
   description = "ARN of the stream"
 }
