@@ -1,8 +1,3 @@
-variable "name" {
-  type        = string
-  description = "The name of the stream"
-}
-
 variable "buffer_size" {
   type        = number
   default     = 128
@@ -13,6 +8,15 @@ variable "buffer_interval" {
   type        = number
   default     = 60
   description = "Buffer incoming data for the specified period of time, in seconds"
+}
+
+variable "columns" {
+  type = list(object({
+    name = string,
+    type = string,
+  }))
+  default     = []
+  description = "The columns in the table, where the key is the name of the column and the value the type"
 }
 
 variable "error_prefix" {
@@ -33,9 +37,15 @@ variable "glue_table_name" {
   description = "The Glue table that contains the column information that constitutes your data schema"
 }
 
-variable "kms_key_id" {
+variable "name" {
   type        = string
-  description = "The KMS key ID used to encrypt all data"
+  description = "The name of the stream"
+}
+
+variable "kinesis" {
+  type        = bool
+  default     = true
+  description = "If true a kinesis stream will be created"
 }
 
 variable "kms_key_arn" {
@@ -49,13 +59,38 @@ variable "parquet" {
   description = "If true the parquet serializer will be used"
 }
 
-variable "prefix" {
+variable "partition_keys" {
+  type = list(object({
+    name = string,
+    type = string,
+  }))
+  default = [
+    { name = "event_day", type = "date" },
+  ]
+  description = "The partition_keys in the table, where the key is the name of the partition and the value the type"
+}
+
+variable "time_format" {
   type        = string
-  default     = "data/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+  default     = "year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
   description = "The time format prefix used for delivered S3 files"
+}
+
+variable "s3_bucket_name" {
+  type        = string
+  default     = null
+  description = "If set, use this bucket instead of creating it"
+}
+
+variable "s3_prefix" {
+  type        = string
+  default     = ""
+  description = "The prefix used when storing files in S3"
 }
 
 variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the stream"
 }
+
+
